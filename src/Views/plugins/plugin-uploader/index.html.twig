@@ -7,15 +7,32 @@
 {% block body_content %}
   <div class="container">
   {% for repository in search.items %}
-      <div class="col-md-6">
-        <h4><a target="_blank" href="{{ repository.html_url }}"><strong>{{ repository.full_name }}<strong/></a></h4>
-        <button class="btn btn-info btn-sm" type="button">
-          <i class="fa fa-eye" aria-hidden="true"></i> Watchers <span class="badge"><strong>{{ repository.watchers_count }}</strong></span>
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <h3 class="panel-title pull-left">{{ repository.full_name }}</h3>
+        <button class="btn btn-primary btn-sm pull-right" type="button">
+          <i class="fa fa-version" aria-hidden="true"></i> {{ 'version' }}</span>
         </button>
-        <button class="btn btn-info btn-sm" type="button">
-          <i class="fa fa-star" aria-hidden="true"></i> Stars <span class="badge"><strong>{{ repository.stargazers_count }}</strong></span>
-        </button>
+        <div class="clearfix"></div>
       </div>
+      <div class="panel-body">
+          <p>{{ repository.description }}</p>
+          <hr>
+          <button class="btn btn-info btn-sm" type="button">
+            <i class="fa fa-eye" aria-hidden="true"></i> Watchers <span class="badge"><strong>{{ repository.watchers_count }}</strong></span>
+          </button>
+          <button class="btn btn-info btn-sm" type="button">
+            <i class="fa fa-star" aria-hidden="true"></i> Stars <span class="badge"><strong>{{ repository.stargazers_count }}</strong></span>
+          </button>
+
+          <button class="btn btn-primary btn-sm pull-right" type="button">
+            <i class="fa fa-plus" aria-hidden="true"></i> Installer</span>
+          </button>
+          <button class="btn btn-primary btn-sm pull-right" type="button">
+            <i class="fa fa-plus" aria-hidden="true"></i> Consulter</span>
+          </button>
+        </div>
+    </div>
   {% endfor %}
   </div>
 {% endblock %}
