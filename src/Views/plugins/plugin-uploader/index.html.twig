@@ -1,0 +1,21 @@
+{% extends 'home/index.html.twig' %}
+
+{% block head_style %}
+  {{ parent() }}
+{% endblock %}
+
+{% block body_content %}
+  <div class="container">
+  {% for repository in search.items %}
+      <div class="col-md-6">
+        <h4><a target="_blank" href="{{ repository.html_url }}"><strong>{{ repository.full_name }}<strong/></a></h4>
+        <button class="btn btn-info btn-sm" type="button">
+          <i class="fa fa-eye" aria-hidden="true"></i> Watchers <span class="badge"><strong>{{ repository.watchers_count }}</strong></span>
+        </button>
+        <button class="btn btn-info btn-sm" type="button">
+          <i class="fa fa-star" aria-hidden="true"></i> Stars <span class="badge"><strong>{{ repository.stargazers_count }}</strong></span>
+        </button>
+      </div>
+  {% endfor %}
+  </div>
+{% endblock %}

@@ -1,0 +1,4 @@
+plugins:
+  plugin-uploader:
+    class: PluginUploader\PluginUploader
+    options: ~

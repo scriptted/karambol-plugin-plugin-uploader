@@ -1,0 +1,19 @@
+{
+    "name": "scriptted/karambol-plugin-plugin-uploader",
+    "description": "Karambol plugin enabling an uploader for automatic plugin installation",
+    "authors": [
+        {
+            "name": "Teddy Cornaut",
+            "email": "teddy.cornaut@gmail.com"
+        }
+    ],
+    "require": {
+        "knplabs/github-api": "@dev",
+        "php-http/guzzle6-adapter": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "PluginUploader\\": "src/"
+        }
+    }
+}
