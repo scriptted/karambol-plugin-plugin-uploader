@@ -9,11 +9,7 @@
   {% for repository in search.items %}
     <div class="panel panel-info">
       <div class="panel-heading">
-        <h3 class="panel-title pull-left">{{ repository.full_name }}</h3>
-        <button class="btn btn-primary btn-sm pull-right" type="button">
-          <i class="fa fa-version" aria-hidden="true"></i> {{ 'version' }}</span>
-        </button>
-        <div class="clearfix"></div>
+        <h3 class="panel-title"><strong>{{ repository.full_name|lower }} <span class="pull-right"><i class="fa fa-code-fork" aria-hidden="true"></i> {{ '0.0.1' }}</span></strong></h3>
       </div>
       <div class="panel-body">
           <p>{{ repository.description }}</p>
@@ -25,14 +21,114 @@
             <i class="fa fa-star" aria-hidden="true"></i> Stars <span class="badge"><strong>{{ repository.stargazers_count }}</strong></span>
           </button>
 
-          <button class="btn btn-primary btn-sm pull-right" type="button">
-            <i class="fa fa-plus" aria-hidden="true"></i> Installer</span>
-          </button>
-          <button class="btn btn-primary btn-sm pull-right" type="button">
-            <i class="fa fa-plus" aria-hidden="true"></i> Consulter</span>
-          </button>
+          <div class="pull-right">
+            <a href="{{ repository.html_url }}" target="_blank" class="btn btn-primary btn-sm" type="button">
+              <i class="fa fa-github" aria-hidden="true"></i> Consulter</span>
+            </a>
+            {% if app.app_path.existsInApp('vendor/'~repository.full_name|lower) %}
+              <button class="btn btn-danger btn-sm uninstall-package" type="button" data-package="{{ repository.full_name }}">
+                <i class="fa fa-trash" aria-hidden="true"></i> Supprimer</span>
+              </button>
+            {% else %}
+              <button class="btn btn-success btn-sm install-package" type="button" data-package="{{ repository.full_name }}">
+                <i class="fa fa-plus" aria-hidden="true"></i> Installer</span>
+              </button>
+            {% endif %}
+          </div>
+
+          <div class="clearfix"></div>
+
+          <pre class="composer hidden" data-package="{{ repository.full_name }}"></pre>
+
+          <div class="clearfix"></div>
         </div>
     </div>
   {% endfor %}
   </div>
+{% endblock %}
+{% block javascript %}
+  {{ parent() }}
+  <script>
+    $('.install-package').on('click', function(){
+      button = $(this);
+      if(button.hasClass('disabled') == false && button.hasClass('uninstall-package') == false){
+        package = button.attr('data-package');
+        button.removeClass('btn-success');
+        button.addClass('btn-warning');
+        button.addClass('disabled');
+        button.html('<i class="fa fa-cog fa-spin"></i> Installation...');
+        $.ajax({
+  	        type: "POST",
+  	        url: "{{ path('admin_plugins_plugin_loader_require_ajax') }}",
+  	        data: {package: package},
+  	        cache: false,
+  	        success: function(data){
+              clearInterval(timer);
+              setTimeout(function(){
+                $('.composer[data-package="'+package+'"]').addClass('hidden');
+                $('.composer[data-package="'+package+'"]').empty();
+              }, 2000);
+              button.html('<i class="fa fa-trash"></i> Supprimer');
+              button.removeClass('install-package');
+              button.removeClass('btn-warning');
+              button.removeClass('disabled');
+              button.addClass('uninstall-package');
+              button.addClass('btn-danger');
+  	        }
+  	    });
+        displayProgress(package);
+      }
+	    return false;
+    });
+
+    $('.uninstall-package').on('click', function(){
+      button = $(this);
+      if(button.hasClass('disabled') == false && button.hasClass('install-package') == false){
+        package = button.attr('data-package');
+        button.removeClass('btn-danger');
+        button.addClass('btn-warning');
+        button.addClass('disabled');
+        button.html('<i class="fa fa-cog fa-spin"></i> Désinstallation...');
+        $.ajax({
+  	        type: "POST",
+  	        url: "{{ path('admin_plugins_plugin_loader_remove_ajax') }}",
+  	        data: {package: package},
+  	        cache: false,
+  	        success: function(data){
+              clearInterval(timer);
+              setTimeout(function(){
+                $('.composer[data-package="'+package+'"]').addClass('hidden');
+                $('.composer[data-package="'+package+'"]').empty();
+              }, 2000);
+              button.html('<i class="fa fa-plus"></i> Installer');
+              button.removeClass('uninstall-package');
+              button.removeClass('btn-warning');
+              button.removeClass('disabled');
+              button.addClass('install-package');
+              button.addClass('btn-success');
+  	        }
+  	    });
+        displayProgress(package);
+      }
+	    return false;
+    });
+
+    var timer;
+
+    function displayProgress(package){
+         timer = setInterval(function(){
+           $.ajax({
+     	        type: "GET",
+     	        url: "{{ path('admin_plugins_plugin_loader_progress_ajax') }}",
+     	        data: {},
+     	        cache: false,
+     	        success: function(data){
+                 $('.composer[data-package="'+package+'"]').removeClass('hidden');
+                 $('.composer[data-package="'+package+'"]').html(data.composerProgress + '...');
+     	        }
+     	    });
+        }, 500);
+    }
+
+  </script>
 {% endblock %}
